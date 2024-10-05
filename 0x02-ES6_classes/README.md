@@ -1,1 +1,2 @@
-0x02. ES6 classes
+# ES6 Classes Project
+This project is part of the ALX Backend JavaScript
