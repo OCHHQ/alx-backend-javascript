@@ -19,12 +19,12 @@ export default class Currency {
   }
 
   get name() {
-    return this._name
+    return this._name;
   }
 
   set name(newName) {
-    if (typeof newName != 'string') {
-        throw new TypeError('Name must be a string');
+    if (typeof newName !== 'string') {
+      throw new TypeError('Name must be a string');
     }
     this._name = newName;
   }
