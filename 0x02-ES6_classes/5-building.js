@@ -1,20 +1,18 @@
-// understanding abstract class
-export default class Building {
-  constructor(sqft) {
-    if (typeof sqft !== 'number') {
-      throw new TypeError('square feet must be a number');
+class Building {
+    constructor(sqft) {
+      this._sqft = sqft;
+  
+      // Check if this is an instance of a class that extends Building
+      if (this.constructor !== Building) {
+        if (typeof this.evacuationWarningMessage !== 'function') {
+          throw new Error('Class extending Building must override evacuationWarningMessage');
+        }
+      }
     }
-    // store the sqft as a private attribute
-    this._sqft = sqft;
-  }
-
-  get sqft() {
-    return this._sqft;
-  }
-
-    // eslint-disable-next-line class-methods-use-this
-    evacuationWarningMessage() {
-    throw new Error('Class extending Building must override evacuationWarningMessage');
+  
+    get sqft() {
+      return this._sqft;
+    }
   }
   
-}
+  export default Building;
