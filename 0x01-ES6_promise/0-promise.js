@@ -1,6 +1,8 @@
-// Exporting the function as required
-export default function getResponseFromAPI() {
-    return new Promise((resolve, reject) => {
-        resolve("Success");
+function getResponseFromAPI() {
+    return new Promise((resolve) => {
+      resolve('Success');  // Use single quotes instead of double quotes
     });
-}
+  }
+  
+  module.exports = getResponseFromAPI;
+  
