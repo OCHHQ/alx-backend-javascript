@@ -7,10 +7,8 @@ export default function handleProfileSignup(firstName, lastName, fileName) {
 
   // Use Promise.allSettled to handle both promises, regardless of success or failure
   return Promise.allSettled([signUpPromise, uploadPhotoPromise])
-    .then((results) =>
-      results.map((result) => ({
-        status: result.status,
-        value: result.status === 'fulfilled' ? result.value : result.reason,
-      }))
-    );
+    .then((results) => results.map((result) => ({
+      status: result.status,
+      value: result.status === 'fulfilled' ? result.value : result.reason,
+    })));
 }
