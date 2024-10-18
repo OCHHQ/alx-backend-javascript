@@ -1,16 +1,24 @@
-// Create an instance of WeakMap
+// 100-weak.js
+
+// Create a WeakMap to track API query counts
 export const weakMap = new WeakMap();
 
-// Function to track API queries
 export function queryAPI(endpoint) {
-  // Check if the endpoint already exists in the weakMap
-  const queryCount = weakMap.get(endpoint) || 0;
+  if (!(endpoint instanceof Object)) {
+    throw new Error('Cannot process');
+  }
+
+  // Get the current count for this endpoint
+  let count = weakMap.get(endpoint) || 0;
 
   // Increment the count
-  if (queryCount >= 5) {
+  count += 1;
+
+  // Check if the count exceeds or equals 5
+  if (count >= 5) {
     throw new Error('Endpoint load is high');
   }
 
-  // Set the updated count back into the weakMap
-  weakMap.set(endpoint, queryCount + 1);
+  // Update the WeakMap with the new count
+  weakMap.set(endpoint, count);
 }
