@@ -18,3 +18,4 @@ Run full test suite: npm run full-test
 Files
 
 0-console.js: Basic console logging function
+1-stdin.js: Using Process stdin
