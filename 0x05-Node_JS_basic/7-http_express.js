@@ -44,21 +44,24 @@ const PORT = 1245;
 
 // Route for root path
 app.get('/', (req, res) => {
-  res.send('Hello Holberton School!');
+  res.status(200).send('Hello Holberton School!');
 });
 
 // Route for students path
 app.get('/students', async (req, res) => {
-  try {
-    const databasePath = process.argv[2];
+  const databasePath = process.argv[2];
 
-    if (!databasePath) {
-      res.status(500).send('Database path not provided');
-      return;
-    }
+  if (!databasePath) {
+    res.status(500).send('Database path not provided');
+    return;
+  }
+
+  try {
+    // Check if file exists before reading
+    await fs.access(databasePath);
 
     const studentInfo = await countStudents(databasePath);
-    res.send(`This is the list of our students\n${studentInfo}`);
+    res.status(200).send(`This is the list of our students\n${studentInfo}`);
   } catch (error) {
     res.status(500).send('Cannot load the database');
   }
