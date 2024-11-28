@@ -1,48 +1,77 @@
+const http = require('http');
 const fs = require('fs');
 
-const countStudents = (path) => {
-  try {
-    // Read file synchronously
-    const data = fs.readFileSync(path, 'utf-8');
-    const lines = data.split('\n').filter((line) => line.trim() !== ''); // Remove empty lines
+// Function to count students in a CSV file and display their information
+const countStudents = (filePath) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                return reject(new Error('Cannot load the database'));
+            }
+            
+            const lines = data.trim().split('\n');
+            const students = [];
+            const studentsByField = {};
 
-    if (lines.length <= 1) {
-      throw new Error('Cannot load the database');
-    }
+            lines.forEach((line, index) => {
+                // Skip header
+                if (index === 0) return;
+                
+                const [firstName, field] = line.split(',');
+                if (firstName && field) {
+                    students.push(firstName);
+                    if (!studentsByField[field]) {
+                        studentsByField[field] = [];
+                    }
+                    studentsByField[field].push(firstName);
+                }
+            });
 
-    // Extract header and rows
-    const header = lines[0].split(',');
-    const rows = lines.slice(1);
+            // Construct response
+            let response = `Number of students: ${students.length}\n`;
+            for (const [field, names] of Object.entries(studentsByField)) {
+                response += `Number of students in ${field}: ${names.length}. List: ${names.join(', ')}\n`;
+            }
 
-    // Initialize variables to store student counts and fields
-    const fieldCounts = {};
-    const totalStudents = rows.length;
-
-    rows.forEach((row) => {
-      const studentData = row.split(',');
-      if (studentData.length === header.length) {
-        const field = studentData[3]; // Assuming the field is the 4th column (index 3)
-        const firstName = studentData[0]; // Assuming first name is the 1st column (index 0)
-        if (!fieldCounts[field]) {
-          fieldCounts[field] = { count: 0, names: [] };
-        }
-        fieldCounts[field].count += 1;
-        fieldCounts[field].names.push(firstName);
-      }
+            resolve(response.trim());
+        });
     });
-
-    // Log the total number of students
-    console.log(`Number of students: ${totalStudents}`);
-
-    // Log the number of students per field and their names
-    for (const [field, { count, names }] of Object.entries(fieldCounts)) {
-      console.log(
-        `Number of students in ${field}: ${count}. List: ${names.join(', ')}`,
-      );
-    }
-  } catch (error) {
-    throw new Error('Cannot load the database');
-  }
 };
 
-module.exports = countStudents;
+// Create the HTTP server
+const app = http.createServer(async (req, res) => {
+    if (req.url === '/') {
+        // Handle the root route
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('Hello Holberton School!\n');
+    } else if (req.url === '/students') {
+        // Handle the /students route
+        const databasePath = process.argv[2];
+        if (!databasePath) {
+            res.writeHead(400, { 'Content-Type': 'text/plain' });
+            res.end('Database file path is required as an argument.\n');
+            return;
+        }
+
+        try {
+            const studentsList = await countStudents(databasePath);
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end(`This is the list of our students\n${studentsList}\n`);
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end(error.message);
+        }
+    } else {
+        // Handle unsupported routes
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found\n');
+    }
+});
+
+// Listen on port 1245
+app.listen(1245, () => {
+    console.log('Server is listening on port 1245');
+});
+
+// Export the app for potential external use
+module.exports = app;
